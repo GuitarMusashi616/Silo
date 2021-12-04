@@ -1,5 +1,5 @@
 # Silo
-Computercraft Expandable Item Inventory - Get items from chests, Dump items to chests
+Computercraft Expandable Item Inventory  
 ~~~
 Usage: silo                  -- view all items in storage
        silo get <item> [#]   -- get [#] items from storage with <item> in item's name
