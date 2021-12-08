@@ -19,7 +19,7 @@ Usage: silo                  -- view all items in storage
 wget https://raw.githubusercontent.com/GuitarMusashi616/Silo/master/silo.lua
 ~~~
 7) choose a dump chest and pickup chest, edit DUMP_CHEST_NAME and PICKUP_CHEST_NAME in the silo.lua file so that they have the correct chest name at the right of their respective equals sign (chest name is displayed when right clicking modem next to the chest) (run "edit silo" to edit file)
-8) all done, now the above commands should work
+8) all done
 
 
 #### Required Mods:
