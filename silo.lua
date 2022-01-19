@@ -2,8 +2,8 @@
 
 -- connect chests to computer with wired modems
 -- specify name of dump chest and pickup chest (all other chests connected to modem network will be used as storage)
-local DUMP_CHEST_NAME = "minecraft:chest_9"
-local PICKUP_CHEST_NAME = "minecraft:chest_8"
+local DUMP_CHEST_NAME = "minecraft:chest_26"
+local PICKUP_CHEST_NAME = "minecraft:chest_27"
 
 
 local tArgs = {...}
@@ -110,9 +110,10 @@ function silo.get_item(item_name, count)
 end
 
 -- try to suck the slot of dump chest with storage chests
-function silo.try_to_dump(slot, count)
+function silo.try_to_dump(slot, count, target)
+  target = target or silo.dump_chest
   for chest_name in all(silo.chest_names) do
-    local num = peripheral.call(silo.dump_chest, "pushItems", chest_name, slot, count)
+    local num = peripheral.call(target, "pushItems", chest_name, slot, count)
     if num >= count then
       return true
     end
@@ -120,10 +121,11 @@ function silo.try_to_dump(slot, count)
 end
 
 -- for all storage chest try to suck everythin in the dump chest
-function silo.dump()
-  local suck_this = peripheral.call(silo.dump_chest, "list")
+function silo.dump(target)
+  target = target or silo.dump_chest
+  local suck_this = peripheral.call(target, "list")
   for k,v in pairs(suck_this) do
-    if not silo.try_to_dump(k,v.count) then
+    if not silo.try_to_dump(k,v.count,target) then
       return false
     end
   end
@@ -178,6 +180,9 @@ function main()
     local item = tArgs[2]
     assert(item, "must specify item name with that command")
     local count = tArgs[3] or 1
+    if count == "all" then
+      count = 1/0
+    end
     
     if tArgs[1] == "search" then
       silo.search(item)
@@ -185,6 +190,12 @@ function main()
     elseif tArgs[1] == "get" then
       silo.get_item(item, count)
       print(tostring(item).. " transferred to pickup chest")
+    elseif tArgs[1] == "dump" then
+      if silo.dump(silo.pickup_chest) then
+          print("pickup chest dumped successfully")
+      else
+          print("could not dump pickup chest")
+      end
     end
   end
 end
