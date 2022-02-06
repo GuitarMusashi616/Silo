@@ -223,7 +223,7 @@ function listItems(word)
   return itemChoices
 end
 
-function dumpChests(itemChoices)
+function dumpChests(itemChoices, word)
   notify("dumping...")
   local a = silo.dump(silo.dump_chest)
   local b = silo.dump(silo.pickup_chest)
@@ -236,7 +236,7 @@ function dumpChests(itemChoices)
   end
 end
 
-function grabStack(sel, itemChoices)
+function grabStack(sel, itemChoices, word)
   if sel > #itemChoices then
     notify(("%i is not an option"):format(sel),0)
     return
@@ -281,10 +281,10 @@ function main()
       term.write(":")
       itemChoices = listItems(word)
     elseif key == "tab" then
-      dumpChests(itemChoices)
+      dumpChests(itemChoices, word)
     elseif 49 <= keyCode and keyCode <= 57 then
       local sel = keyCode - 48
-      grabStack(sel, itemChoices)
+      grabStack(sel, itemChoices, word)
     end
   end
 end
