@@ -263,20 +263,21 @@ while true do
     end
   elseif 49 <= keyCode and keyCode <= 57 then
     local sel = keyCode - 48
-    if sel > #itemChoices then
-      error(("%i is not an option"):format(sel),0)
-    end
-    local item = itemChoices[sel]
-    local count = silo.dict[item]
-    if count and count > 64 then
-      count = 64
-    end
-    silo.get_item(item, count)
-    silo.dict[item] = silo.dict[item] - count
-    if silo.dict[item] <= 0 then
-      silo.dict[item] = nil
-    end
-    itemChoices = listItems(word)
-    notify(("grabbed %ix %s"):format(count,item)) 
+    if sel <= #itemChoices then
+			local item = itemChoices[sel]
+			local count = silo.dict[item]
+			if count and count > 64 then
+				count = 64
+			end
+			silo.get_item(item, count)
+			silo.dict[item] = silo.dict[item] - count
+			if silo.dict[item] <= 0 then
+				silo.dict[item] = nil
+			end
+			itemChoices = listItems(word)
+			notify(("grabbed %ix %s"):format(count,item)) 
+		else
+		  notify(("%i is not an option"):format(sel))
+		end
   end
 end
