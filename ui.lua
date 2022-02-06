@@ -1,7 +1,7 @@
 -- make a nice ui for selecting items
-
 -- search bar at top with "enter" to show results
 
+-- specify name of dump chest and pickup chest (all other chests connected to modem network will be used as storage)
 local DUMP_CHEST_NAME = "minecraft:chest_2"
 local PICKUP_CHEST_NAME = "minecraft:chest_3"
 
@@ -113,9 +113,10 @@ function silo.get_item(item_name, count)
 end
 
 -- try to suck the slot of dump chest with storage chests
-function silo.try_to_dump(slot, count)
+function silo.try_to_dump(slot, count, target)
+  target = target or silo.dump_chest
   for chest_name in all(silo.chest_names) do
-    local num = peripheral.call(silo.dump_chest, "pushItems", chest_name, slot, count)
+    local num = peripheral.call(target, "pushItems", chest_name, slot, count)
     if num >= count then
       return true
     end
@@ -123,10 +124,11 @@ function silo.try_to_dump(slot, count)
 end
 
 -- for all storage chest try to suck everythin in the dump chest
-function silo.dump()
-  local suck_this = peripheral.call(silo.dump_chest, "list")
+function silo.dump(target)
+  target = target or silo.dump_chest
+  local suck_this = peripheral.call(target, "list")
   for k,v in pairs(suck_this) do
-    if not silo.try_to_dump(k,v.count) then
+    if not silo.try_to_dump(k,v.count,target) then
       return false
     end
   end
