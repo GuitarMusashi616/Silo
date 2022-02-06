@@ -22,5 +22,14 @@ wget https://raw.githubusercontent.com/GuitarMusashi616/Silo/master/silo.lua
 8) all done, now the above commands should work
 
 
+### New UI Version  
+~~~
+Usage: ui       -- silo program with clean user interface
+       ui help  -- instructions will be printed
+~~~
+1) type to search for items  
+2) press 1-9 to get that item  
+3) press tab to clear dump/pickup chest  
+
 #### Required Mods:
 cc-tweaked-1.16.5-1.98.1.jar
