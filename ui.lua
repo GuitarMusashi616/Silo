@@ -1,6 +1,3 @@
--- make a nice ui for selecting items
--- search bar at top with "enter" to show results
-
 -- specify name of dump chest and pickup chest (all other chests connected to modem network will be used as storage)
 local DUMP_CHEST_NAME = "minecraft:chest_2"
 local PICKUP_CHEST_NAME = "minecraft:chest_3"
@@ -80,9 +77,13 @@ end
 -- scan through all invos and put into dict
 function silo.update_all_items()
   for name in all(silo.chest_names) do
-    local items = peripheral.call(name, "list")
-    forEach(items, function(item) silo.add(item) end)
+    silo.update(name)
   end
+end
+
+function silo.update(target)
+  local items = peripheral.call(target, "list")
+  forEach(items, function(item) silo.add(item) end)
 end
 
 function silo.startup()
@@ -225,70 +226,57 @@ function listItems(word)
   return itemChoices
 end
 
-function dumpChests(itemChoices, word)
-  notify("dumping...")
-  local a = silo.dump(silo.dump_chest)
-  local b = silo.dump(silo.pickup_chest)
-  if a and b then
-    silo.update_all_items()
+startup()
+
+local word = ""
+local itemChoices = listItems(word)
+while true do
+  local event,keyCode,isHeld = os.pullEvent("key")
+  local key = keys.getName(keyCode)
+  
+  if #key == 1 then
+    word = word .. key
+    term.write(key)
+    itemChoices = listItems(word) 
+  elseif key == "space" then
+    word = word .. " "
+    term.write(" ")
     itemChoices = listItems(word)
-    notify("dump successful")
-  else
-    notify("dump failed")
-  end
-end
-
-function grabStack(sel, itemChoices, word)
-  if sel > #itemChoices then
-    notify(("%i is not an option"):format(sel),0)
-    return
-  end
-  local item = itemChoices[sel]
-  local count = silo.dict[item]
-  if count and count > 64 then
-    count = 64
-  end
-  silo.get_item(item, count)
-  silo.dict[item] = silo.dict[item] - count
-  if silo.dict[item] <= 0 then
-    silo.dict[item] = nil
-  end
-  itemChoices = listItems(word)
-  notify(("grabbed %ix %s"):format(count,item))
-end
-
-function main()
-  startup()
-
-  local word = ""
-  local itemChoices = listItems(word)
-  while true do
-    local event,keyCode,isHeld = os.pullEvent("key")
-    local key = keys.getName(keyCode)
-    
-    if #key == 1 then
-      word = word .. key
-      term.write(key)
-      itemChoices = listItems(word) 
-    elseif key == "space" then
-      word = word .. " "
-      term.write(" ")
+  elseif key == "backspace" then
+    word = word:sub(1,#word-1)
+    backspace()
+    itemChoices = listItems(word)
+  elseif key == "semicolon" then
+    word = word .. ":"
+    term.write(":")
+    itemChoices = listItems(word)
+  elseif key == "tab" then
+    notify("dumping...")
+    local a = silo.dump(silo.dump_chest)
+    local b = silo.dump(silo.pickup_chest)
+    if a and b then
+      silo.update_all_items()
       itemChoices = listItems(word)
-    elseif key == "backspace" then
-      word = word:sub(1,#word-1)
-      backspace()
-      itemChoices = listItems(word)
-    elseif key == "semicolon" then
-      word = word .. ":"
-      term.write(":")
-      itemChoices = listItems(word)
-    elseif key == "tab" then
-      dumpChests(itemChoices, word)
-    elseif 49 <= keyCode and keyCode <= 57 then
-      local sel = keyCode - 48
-      grabStack(sel, itemChoices, word)
+      notify("dump successful")
+    else
+      notify("dump failed")
     end
+  elseif 49 <= keyCode and keyCode <= 57 then
+    local sel = keyCode - 48
+    if sel > #itemChoices then
+      error(("%i is not an option"):format(sel),0)
+    end
+    local item = itemChoices[sel]
+    local count = silo.dict[item]
+    if count and count > 64 then
+      count = 64
+    end
+    silo.get_item(item, count)
+    silo.dict[item] = silo.dict[item] - count
+    if silo.dict[item] <= 0 then
+      silo.dict[item] = nil
+    end
+    itemChoices = listItems(word)
+    notify(("grabbed %ix %s"):format(count,item)) 
   end
 end
-
-main()
