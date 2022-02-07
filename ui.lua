@@ -1,3 +1,6 @@
+-- recommend each chest only touching at most 1 modem
+-- recommend flat wired modem for computer
+
 -- specify name of dump chest and pickup chest (all other chests connected to modem network will be used as storage)
 local DUMP_CHEST_NAME = "minecraft:chest_2"
 local PICKUP_CHEST_NAME = "minecraft:chest_3"
@@ -76,6 +79,7 @@ end
 
 -- scan through all invos and put into dict
 function silo.update_all_items()
+  silo.dict = {}
   for name in all(silo.chest_names) do
     silo.update(name)
   end
