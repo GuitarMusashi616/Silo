@@ -404,6 +404,10 @@ while true do
     word = word .. ":"
     term.write(":")
     itemChoices = listItems(word)
+  elseif key == "minus" then
+    word = word .. "_"
+    term.write("_")
+    itemChoices = listItems(word)
   elseif key == "grave" then
     backspace(#word)
     word = ""
@@ -433,34 +437,33 @@ while true do
   elseif 49 <= keyCode and keyCode <= 57 then
     local sel = keyCode - 48
     if sel <= #itemChoices then
-			 local item = itemChoices[sel]
-			 local count = silo.dict[item]
-			 if count and count > 64 then
-			  	count = 64
-			 end
-    if count == 0 then
-      local potential, msg = silo.how_many(item)
-      if potential == 0 then
-        notify(msg)
-      else   
-      
-        local prompt = ("how many? (max %i) "):format(potential)
-        local num = getUserInput(prompt)
-        num = tonumber(num)
-        if num > potential then
-          notify(("can only make up to %i"):format(potential))
-        else
-          notify(("crafting %i %s"):format(num, item))
-          silo.craft(item, num)
-        end
+      local item = itemChoices[sel]
+      local count = silo.dict[item]
+      if count and count > 64 then
+        count = 64
       end
+      if count == 0 then
+        local potential, msg = silo.how_many(item)
+        if potential == 0 then
+          notify(msg)
+        else   
+          local prompt = ("how many? (max %i) "):format(potential)
+          local num = getUserInput(prompt)
+          num = tonumber(num)
+          if num > potential then
+            notify(("can only make up to %i"):format(potential))
+          else
+            notify(("crafting %i %s"):format(num, item))
+            silo.craft(item, num)
+          end
+        end
+      else
+        silo.get_item(item, count)
+        itemChoices = listItems(word)
+        notify(("grabbed %ix %s"):format(count,item))
+      end 
     else
-			   silo.get_item(item, count)
-			   itemChoices = listItems(word)
-			   notify(("grabbed %ix %s"):format(count,item))
-    end 
-		else
-		  notify(("%i is not an option"):format(sel))
-		end
+      notify(("%i is not an option"):format(sel))
+    end
   end
 end
