@@ -174,14 +174,17 @@ function startup()
   silo.update_all_items()
 end
 
-function backspace()
-  local x,y = term.getCursorPos()
-  if x <= 9 then
+function backspace(num)
+  num = num or 1
+  local x, y = term.getCursorPos()
+  if x - num <= 8 then
     return
   end
-  term.setCursorPos(x-1,y)
-  term.write(" ")
-  term.setCursorPos(x-1,y)
+  term.setCursorPos(x - num, y)
+  for _ = 1, num do
+    term.write(" ")
+  end
+  term.setCursorPos(x - num, y)
 end
 
 function printWord(word)
