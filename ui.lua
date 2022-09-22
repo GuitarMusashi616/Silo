@@ -17,7 +17,7 @@ if #tArgs > 0 then
 end
 
 -- helper functions --
-function all(tbl) 
+function all(tbl)
   local prev_k = nil
   return function()
     local k,v = next(tbl, prev_k)
@@ -152,14 +152,14 @@ function silo.get_capacity()
   local total_slots = 0
   local used_slots = 0
   local used_items = 0
-  
+
   for name in all(silo.chest_names) do
     total_slots = total_slots + peripheral.call(name, "size")
     local items = peripheral.call(name, "list")
     used_slots = used_slots + #items
     forEach(items, function(item) used_items = used_items + item.count end)
   end
-  
+
   print("slots used ".. tostring(used_slots) .. "/" .. tostring(total_slots))
   print("items stored "..tostring(used_items) .. "/" .. tostring(total_slots*64))
 end
@@ -169,7 +169,7 @@ function startup()
   term.setCursorPos(1,1)
   term.write("Search: ")
   term.setCursorBlink(true)
-  
+
   silo.startup()
   silo.update_all_items()
 end
@@ -237,11 +237,11 @@ local itemChoices = listItems(word)
 while true do
   local event,keyCode,isHeld = os.pullEvent("key")
   local key = keys.getName(keyCode)
-  
+
   if #key == 1 then
     word = word .. key
     term.write(key)
-    itemChoices = listItems(word) 
+    itemChoices = listItems(word)
   elseif key == "space" then
     word = word .. " "
     term.write(" ")
@@ -249,6 +249,10 @@ while true do
   elseif key == "backspace" then
     word = word:sub(1,#word-1)
     backspace()
+    itemChoices = listItems(word)
+  elseif key == "grave" then
+    backspace(#word)
+    word = ""
     itemChoices = listItems(word)
   elseif key == "semicolon" then
     word = word .. ":"
@@ -268,20 +272,20 @@ while true do
   elseif 49 <= keyCode and keyCode <= 57 then
     local sel = keyCode - 48
     if sel <= #itemChoices then
-			local item = itemChoices[sel]
-			local count = silo.dict[item]
-			if count and count > 64 then
-				count = 64
-			end
-			silo.get_item(item, count)
-			silo.dict[item] = silo.dict[item] - count
-			if silo.dict[item] <= 0 then
-				silo.dict[item] = nil
-			end
-			itemChoices = listItems(word)
-			notify(("grabbed %ix %s"):format(count,item)) 
-		else
-		  notify(("%i is not an option"):format(sel))
-		end
+      local item = itemChoices[sel]
+      local count = silo.dict[item]
+      if count and count > 64 then
+        count = 64
+      end
+      silo.get_item(item, count)
+      silo.dict[item] = silo.dict[item] - count
+      if silo.dict[item] <= 0 then
+        silo.dict[item] = nil
+      end
+      itemChoices = listItems(word)
+      notify(("grabbed %ix %s"):format(count,item))
+    else
+      notify(("%i is not an option"):format(sel))
+    end
   end
 end
